@@ -28,11 +28,24 @@ fn main() {
 #[derive(Component)]
 pub struct Player {
     can_collide: bool,
+    collidable_texture: Handle<Image>,
+    not_collidable_texture: Handle<Image>,
 }
 
 #[derive(Component)]
 pub struct Enemy {
     direction: Vec3
+}
+
+pub enum PowerupType {
+    Refule, // to resule the invisiblity of the player.
+    Decelerator, // to slow down other enimies.
+    Multiplier // to increase the increment of the score.
+}
+
+#[derive(Component)]
+pub struct Powerup {
+    power: PowerupType
 }
 
 #[derive(Event)]
@@ -52,6 +65,8 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Player {
             can_collide: true,
+            collidable_texture: asset_server.load("sprites/ball_blue_small.png"),
+            not_collidable_texture: asset_server.load("sprites/hole.png")
         }
     ));
 }
@@ -194,9 +209,7 @@ pub fn player_collision(
                 commands.entity(player_entity).despawn();
             }
         }
-
     }
-
 }
 
 pub fn toggle_player_collision(
@@ -223,17 +236,16 @@ pub fn toggle_player_collision(
 pub fn testing(
     mut event: EventReader<OnPlayerCollisionStateChanged>,
     mut player_texture: Query<(&Player, &mut Handle<Image>), With<Player>>,
-    asset_server: Res<AssetServer>
 ) {
     for e in event.read() {
         
         if let Ok((player, mut texture)) = player_texture.get_single_mut() {
             
             *texture = if e.state {
-                asset_server.load("sprites/ball_blue_small.png")
+                player.collidable_texture.clone()
             }
             else {
-                asset_server.load("sprites/hole.png")
+                player.not_collidable_texture.clone()
             }
 
         }
