@@ -11,8 +11,9 @@ impl Plugin for EnemyPlugin {
 
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_enimies)
-        .add_systems(Update, enemy_movement)
-        .add_systems(Update, enemy_confinement);
+        .add_systems(Update, (
+                enemy_movement,
+                enemy_confinement
+            ).chain());
     }
-
 }

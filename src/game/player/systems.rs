@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 use super::components::*;
-use crate::enemy::components::*;
+use crate::game::enemy::components::*;
 use super::events::*;
 
 const PLAYER_SPEED: f32 = 500.0;
