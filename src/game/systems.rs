@@ -6,7 +6,7 @@ pub fn toggle_state(
     mut next_state: ResMut<NextState<GameState>>,
     current_state: Res<State<GameState>>
 ) {
-    if input.pressed(KeyCode::Escape) {
+    if input.just_pressed(KeyCode::Escape) {
         match current_state.get() {
             GameState::Running => next_state.set(GameState::Paused),
             GameState::Paused => next_state.set(GameState::Running)

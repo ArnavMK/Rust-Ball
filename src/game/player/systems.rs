@@ -83,7 +83,8 @@ pub fn player_boundry_checker(
 pub fn player_collision(
     player_query: Query<(Entity, &Transform, &Player), With<Player>>,
     enemy_query: Query<&Transform, With<Enemy>>,
-    mut commands: Commands
+    mut commands: Commands,
+    mut event: EventWriter<OnPlayerDeath>
 ) {
 
     if let Ok((player_entity, player_transform, player)) = player_query.get_single() {
@@ -99,6 +100,7 @@ pub fn player_collision(
             );
             
             if distance <= collision_threshold {
+                event.send(OnPlayerDeath);
                 commands.entity(player_entity).despawn();
             }
         }
@@ -144,3 +146,4 @@ pub fn toggle_player_collision_visual(
         }
     }
 }
+
