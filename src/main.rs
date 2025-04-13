@@ -1,12 +1,11 @@
 use bevy::prelude::*;
-use crate::game::Game;
-use crate::main_menu::*;
+use crate::game::*;
+use crate::ui::events::*;
 use crate::game::player::events::*;
-use crate::main_menu::events::*;
+use crate::ui::UiPlugin;
 
-pub mod main_menu;
 pub mod game;
-
+pub mod ui;
 
 fn main() {
     App::new()
@@ -15,15 +14,14 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         .add_systems(Update, (
             game_over_on_player_death.run_if(in_state(AppState::InGame)),
-            start_game_state.run_if(in_state(AppState::MainMenu)),
-            test.run_if(in_state(AppState::GameOver))
+            start_game_state.run_if(in_state(AppState::MainMenu).or_else(in_state(AppState::GameOver))),
         ))
-        .add_plugins((Game, MainMenuScene))
+        .add_plugins((Game, UiPlugin))
 
     .run();
 }
 
-pub fn spawn_camera(mut commands: Commands) {
+fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
@@ -35,7 +33,7 @@ pub enum AppState {
     GameOver
 }
 
-pub fn game_over_on_player_death(
+fn game_over_on_player_death(
     mut next_state: ResMut<NextState<AppState>>,
     mut event: EventReader<OnPlayerDeath>,
 ) {
@@ -44,15 +42,14 @@ pub fn game_over_on_player_death(
     }
 }
 
-pub fn start_game_state(
-    mut next_state: ResMut<NextState<AppState>>,
+
+fn start_game_state(
+    mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
     mut event: EventReader<OnPlayButtonClicked>
 ) {
     for _ in event.read() {
-        next_state.set(AppState::InGame);
+        next_app_state.set(AppState::InGame);
+        next_game_state.set(GameState::Countdown);
     }
-}
-
-pub fn test() {
-    println!("Game Over");
 }

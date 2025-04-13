@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use rand::prelude::*;
 use super::components::*;
 use crate::game::enemy::components::*;
 use super::events::*;
@@ -147,3 +146,11 @@ pub fn toggle_player_collision_visual(
     }
 }
 
+pub fn despawn_player(
+    player_query: Query<Entity, With<Player>>,
+    mut commands: Commands
+) {
+    if let Ok(player_entity) = player_query.get_single() {
+        commands.entity(player_entity).despawn();
+    }
+}

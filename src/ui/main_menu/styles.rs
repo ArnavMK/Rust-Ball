@@ -5,6 +5,11 @@ pub const DEFAULT_BUTTON_COLOR: Color = Color::srgb(0.3, 0.3, 0.3);
 pub const CLICKED_BUTTON_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 pub const HOVERED_BUTTON_COLOR: Color = Color::srgb(0.26, 0.26, 0.26);
 
+
+pub trait ButtonComponent: Component {}
+impl <T: Component> ButtonComponent for T {}
+
+
 pub static BUTTON_STYLE: Lazy<Style> = Lazy::new(|| Style {
     width: Val::Px(200.0),
     height: Val::Px(80.0),
@@ -34,4 +39,36 @@ pub fn default_image_builder(asset_server: &Res<AssetServer>, image: &str) -> Im
         },
         ..default()
     }
-}  
+}
+
+pub fn text_node(asset_server: &Res<AssetServer>, text: &str) -> TextBundle {
+
+    TextBundle {
+        text: Text {
+           sections: vec![
+               TextSection::new(
+                   text,
+                   TextStyle {
+                       font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                       font_size: 32.0,
+                       color: Color::WHITE
+                   }
+               )
+           ],
+           justify: JustifyText::Center,
+           ..default()
+        },
+        ..default()
+    }
+}
+
+pub fn button_node<T: ButtonComponent>(component: T) -> (ButtonBundle, T){
+    (
+        ButtonBundle {
+        style: BUTTON_STYLE.clone(),
+        background_color: DEFAULT_BUTTON_COLOR.into(), 
+        ..default()
+        },
+        component
+    )
+}

@@ -2,22 +2,23 @@ use bevy::prelude::*;
 use crate::AppState;
 use systems::layout::*;
 use systems::interactions::*;
-use events::*;
+use crate::ui::events::*;
+use crate::game::score::systems::create_player_log_file;
 
-mod systems;
-mod components;
-mod styles;
-pub mod events;
+pub mod systems;
 
-pub struct MainMenuScene;
+pub struct MainMenuPlugin;
 
-impl Plugin for MainMenuScene {
+impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
 
         app
 
             // On Enter
-            .add_systems(OnEnter(AppState::MainMenu), spawn_main_menu)
+            .add_systems(OnEnter(AppState::MainMenu), (
+                create_player_log_file,
+                spawn_main_menu
+            ).chain())
             
             // On Exit
             .add_systems(OnExit(AppState::MainMenu), despawn_main_menu)

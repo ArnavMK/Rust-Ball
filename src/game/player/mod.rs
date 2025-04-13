@@ -19,9 +19,12 @@ impl Plugin for PlayerPlugin {
                 player_boundry_checker
             ).chain().run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
             .add_systems(Update, (
-                player_collision,
                 toggle_player_collision,
-                toggle_player_collision_visual
-            ).run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))));
+                toggle_player_collision_visual,
+                player_collision,
+            ).chain().run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
+            
+            .add_systems(OnExit(AppState::InGame), despawn_player)
+        ;
     }
 }
