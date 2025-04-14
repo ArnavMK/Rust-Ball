@@ -3,8 +3,8 @@ use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 use super::components::*;
 
-const NUMBER_OF_ENIMIES: u32 = 15;
-const ENEMY_SPEED: f32 = 300.0;
+const NUMBER_OF_ENIMIES: u32 = 1;
+const ENEMY_SPEED: f32 = 100.0;
 const ENEMY_SIZE: f32 = 64.0;
 
 

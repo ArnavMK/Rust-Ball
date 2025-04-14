@@ -1,14 +1,18 @@
 use bevy::prelude::*;
 
-pub enum PowerupType {
-    Refule, // to resule the invisiblity of the player.
-    Decelerator, // to slow down other enimies.
-    Multiplier // to increase the increment of the score.
+#[derive(Component, Clone)]
+pub enum Powerup {
+    
+    SpeedBoost {
+        multiplier: u32,
+        duration: f32,
+    },
+    TestPower {
+        text: u32
+    }
 }
 
-#[derive(Component)]
-pub struct Powerup {
-    power: PowerupType
-}
-
-
+pub const POWERUP_DEFINITIONS: &[(Powerup, &str)] = &[
+    (Powerup::SpeedBoost {duration: 10.3, multiplier: 10}, "sprites/speed_boost.png"),
+    (Powerup::TestPower {text: 212}, "sprites/test_power.png")
+];

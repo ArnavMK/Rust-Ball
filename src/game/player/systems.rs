@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use super::components::*;
 use crate::game::enemy::components::*;
+use crate::game::power_ups::components::Powerup;
 use super::events::*;
 
 const PLAYER_SPEED: f32 = 500.0;
@@ -19,6 +20,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Player {
             can_collide: true,
+            active_powerups: Vec::new(),
             collidable_texture: asset_server.load("sprites/ball_blue_small.png"),
             not_collidable_texture: asset_server.load("sprites/hole.png")
         }
@@ -90,17 +92,45 @@ pub fn player_collision(
 
         if !player.can_collide {return;}
 
-        let collision_threshold: f32 = PLAYER_SIZE;
-        
+        let collision_threshold: f32 = 64.0;
         for transform in &enemy_query {
-            let distance = f32::sqrt(
-                (player_transform.translation.x - transform.translation.x).powi(2) +
-                (player_transform.translation.y - transform.translation.y).powi(2)
-            );
-            
+
+            let distance = transform.translation.distance(player_transform.translation);
             if distance <= collision_threshold {
                 event.send(OnPlayerDeath);
                 commands.entity(player_entity).despawn();
+            }
+
+        }
+    }
+}
+
+pub fn collect_powerups(
+    player_query: Query<(&Transform, &Player), With<Player>>,
+    powerup_query: Query<(Entity, &Transform, &Powerup)>,
+    mut commands: Commands
+) {
+
+    if let Ok((player_transform, player)) = player_query.get_single() {
+
+        if !player.can_collide {return;}
+
+        for (entity, transform, powerup) in &powerup_query {
+
+            let distance = transform.translation.distance(player_transform.translation);
+            
+            let distance_threshold = PLAYER_SIZE/2.0 + 32.0;
+            if distance <= distance_threshold {
+
+                match powerup {
+                    Powerup::SpeedBoost {multiplier, ..}=> {
+                        println!("SpeedBoost: {}", multiplier);
+                    },
+                    Powerup::TestPower {text} => {
+                        println!("Text: {}", text)
+                    } 
+                }
+                commands.entity(entity).despawn();
             }
         }
     }
