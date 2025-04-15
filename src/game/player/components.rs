@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::game::power_ups::components::*;
 
 #[derive(Clone)]
-pub struct ActivePowerups {
+pub struct ActivePowerup {
     pub kind: Powerup,
     pub timer: Timer,
     pub power_applied: bool
@@ -11,7 +11,7 @@ pub struct ActivePowerups {
 #[derive(Component)]
 pub struct Player {
     pub can_collide: bool,
-    pub active_powerups: Vec<ActivePowerups>,
+    pub active_powerups: Vec<ActivePowerup>,
     pub collidable_texture: Handle<Image>,
     pub not_collidable_texture: Handle<Image>,
 }

@@ -3,9 +3,9 @@ use bevy::window::PrimaryWindow;
 use super::components::*;
 use crate::game::enemy::components::*;
 use crate::game::power_ups::components::Powerup;
+use super::resources::*;
 use super::events::*;
 
-const PLAYER_SPEED: f32 = 500.0;
 const PLAYER_SIZE: f32 = 64.0;
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -31,7 +31,8 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 pub fn player_movement(
     input: Res<ButtonInput<KeyCode>>,
     mut player_transform: Query<&mut Transform, With<Player>>,
-    time: Res<Time>
+    time: Res<Time>,
+    player_speed: Res<PlayerSpeed>
 ) {
 
     if let Ok(mut transform) = player_transform.get_single_mut() {
@@ -56,7 +57,7 @@ pub fn player_movement(
         
         if direction != Vec3::ZERO {
             direction = direction.normalize();
-            transform.translation += direction * PLAYER_SPEED * time.delta_seconds();
+            transform.translation += direction * player_speed.speed * time.delta_seconds();
         }
     }
 }
@@ -108,7 +109,8 @@ pub fn player_collision(
 pub fn collect_powerups(
     player_query: Query<(&Transform, &Player), With<Player>>,
     powerup_query: Query<(Entity, &Transform, &Powerup)>,
-    mut commands: Commands
+    mut commands: Commands,
+    mut events: EventWriter<PowerupCollected>
 ) {
 
     if let Ok((player_transform, player)) = player_query.get_single() {
@@ -122,18 +124,101 @@ pub fn collect_powerups(
             let distance_threshold = PLAYER_SIZE/2.0 + 32.0;
             if distance <= distance_threshold {
 
-                match powerup {
-                    Powerup::SpeedBoost {multiplier, ..}=> {
-                        println!("SpeedBoost: {}", multiplier);
-                    },
-                    Powerup::TestPower {text} => {
-                        println!("Text: {}", text)
-                    } 
-                }
+                events.send(PowerupCollected {
+                    powerup: powerup.clone(), entity
+                });
+                
                 commands.entity(entity).despawn();
             }
         }
     }
+}
+
+pub fn apply_powerup(
+    mut active_powerups: ResMut<ActivePowerups>,
+    mut powerup_collected_event: EventReader<PowerupCollected>,
+    mut powerup_expired_events: EventWriter<PowerupExpired>,
+    mut freez_enemy_event: EventWriter<FreezEnemyEvent>,
+    time: Res<Time>,
+    mut player_speed: ResMut<PlayerSpeed>
+) {
+
+    for event in powerup_collected_event.read() {
+        
+        let powerup = event.powerup.clone();
+        
+        active_powerups.powerups.push((
+            powerup,
+            event.entity,
+            Timer::from_seconds(event.powerup.duration(), TimerMode::Once)
+        ));
+
+       match powerup {
+            Powerup::SpeedBoost {multiplier, ..} => {
+                player_speed.original_speed = player_speed.speed;
+                player_speed.speed *= multiplier;
+                println!("SpeedBoost applied: {}m/s", player_speed.speed);
+            }   
+            Powerup::Freez {multiplier, ..} => {
+                freez_enemy_event.send(FreezEnemyEvent {multiplier, being_applied: true});
+            }
+        }
+    }
+
+    active_powerups.powerups.retain_mut(|(powerup, entity, timer)| {
+        timer.tick(time.delta());
+
+        if timer.finished() {
+            powerup_expired_events.send(PowerupExpired {
+                powerup: powerup.clone(),
+                entity: *entity
+            });
+            return false;
+        }
+        true
+    });
+
+}
+
+pub fn remove_powerup(
+    mut player_speed: ResMut<PlayerSpeed>,
+    mut powerup_expired_events: EventReader<PowerupExpired>,
+    mut freez_enemy_event: EventWriter<FreezEnemyEvent>
+) {
+
+    for e in powerup_expired_events.read() {
+
+        match e.powerup {
+            Powerup::SpeedBoost {..} => {
+                player_speed.speed = player_speed.original_speed;
+                println!("SpeedBoost removed: {}m/s", player_speed.speed);
+            },
+            Powerup::Freez {multiplier, ..} => {
+                freez_enemy_event.send(FreezEnemyEvent {multiplier, being_applied: false});
+            }
+        }
+    }
+}
+
+
+pub fn force_remove_powerups(
+    mut player_speed: ResMut<PlayerSpeed>,
+    mut freez_enemy_event: EventWriter<FreezEnemyEvent>,
+    active_powerups: Res<ActivePowerups>
+) {
+    
+    for (powerup, ..) in active_powerups.powerups.iter() {
+        println!("FORCE REMOVING");
+        match powerup {
+            Powerup::SpeedBoost {..} => {
+                player_speed.speed = player_speed.original_speed;
+            },
+            Powerup::Freez {multiplier, ..} => {
+                freez_enemy_event.send(FreezEnemyEvent {multiplier: *multiplier, being_applied: false});
+            }
+        }
+    }
+
 }
 
 pub fn toggle_player_collision(
@@ -159,19 +244,19 @@ pub fn toggle_player_collision(
 
 pub fn toggle_player_collision_visual(
     mut event: EventReader<OnPlayerCollisionStateChanged>,
-    mut player_texture: Query<(&Player, &mut Handle<Image>), With<Player>>,
+    mut player_query: Query<&mut Handle<Image>, With<Player>>,
+    player_textures: Res<PlayerTextures>
 ) {
     for e in event.read() {
         
-        if let Ok((player, mut texture)) = player_texture.get_single_mut() {
+        if let Ok(mut texture) = player_query.get_single_mut() {
             
             *texture = if e.state {
-                player.collidable_texture.clone()
+                player_textures.collidable.clone_weak()
             }
             else {
-                player.not_collidable_texture.clone()
+                player_textures.not_collidable.clone_weak()
             }
-
         }
     }
 }

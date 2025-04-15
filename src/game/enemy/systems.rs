@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 use super::components::*;
+use crate::game::player::events::FreezEnemyEvent;
 
-const NUMBER_OF_ENIMIES: u32 = 1;
-const ENEMY_SPEED: f32 = 100.0;
+const NUMBER_OF_ENIMIES: u32 = 15;
 const ENEMY_SIZE: f32 = 64.0;
 
 
@@ -37,13 +37,37 @@ pub fn spawn_enimies(
 
 pub fn enemy_movement(
     mut enemy_transform: Query<(&mut Transform, &Enemy)>,
-    time: Res<Time>
+    time: Res<Time>,
+    enemy_speed: Res<EnemySpeed>
 ) {
     for (mut transform, enemy) in &mut enemy_transform {
-        transform.translation += ENEMY_SPEED * enemy.direction * time.delta_seconds();
+        transform.translation += enemy_speed.speed * enemy.direction * time.delta_seconds();
     }
 }
 
+
+pub fn handle_enemy_freez(
+    mut event: EventReader<FreezEnemyEvent>,
+    mut enemy_speed: ResMut<EnemySpeed>
+) {
+    for e in event.read() {
+
+        // apply
+        if e.being_applied {
+            enemy_speed.speed /= e.multiplier;
+            println!("Applied Freez: {}", enemy_speed.speed);
+            continue;
+        }
+
+        // remove
+        enemy_speed.speed = enemy_speed.original_speed;
+        println!("Removed Freez: {}", enemy_speed.speed)
+    } 
+}
+
+pub fn force_reset_speed(mut enemy_speed: ResMut<EnemySpeed>) {
+    enemy_speed.speed = enemy_speed.original_speed;
+}
 
 pub fn enemy_confinement(
     mut enemy_transform: Query<(&Transform, &mut Enemy)>,
@@ -61,7 +85,6 @@ pub fn enemy_confinement(
             if transform.translation.x <= left_egde + radius || transform.translation.x >= right_egde - radius {enemy.direction.x *= -1.0;};
             if transform.translation.y <= lower_egde || transform.translation.y >= upper_egde - radius {enemy.direction.y *= -1.0};
         }
-
     }
 }
 

@@ -32,3 +32,10 @@ pub struct CountdownMenu;
 
 #[derive(Component)]
 pub struct CountdownText;
+
+#[derive(Component)]
+pub struct FuelUi;
+
+
+#[derive(Component)]
+pub struct FuelBar;

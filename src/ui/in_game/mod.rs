@@ -33,6 +33,9 @@ impl Plugin for InGameUiPlugin {
             // countdown UI
             .add_systems(OnEnter(AppState::InGame), spawn_countdown_ui)
             .add_systems(OnExit(GameState::Countdown), despawn_countdown_ui)
+
+            // Fuel bar
+            .add_systems(OnEnter(AppState::InGame), spawn_fuel_ui)
         ;
     }
 }

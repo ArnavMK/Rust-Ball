@@ -9,7 +9,7 @@ impl Default for PowerUpSpawnTimer {
 
     fn default() -> PowerUpSpawnTimer {
         PowerUpSpawnTimer {
-            timer: Timer::from_seconds(2.0, TimerMode::Repeating)
+            timer: Timer::from_seconds(13.0, TimerMode::Repeating)
         }
     }
 

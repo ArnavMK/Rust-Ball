@@ -119,3 +119,53 @@ fn build_countdown_ui(
         parent.spawn(text_node_with_component(asset_server, String::from("4"), CountdownText));
     });
 }
+
+pub fn spawn_fuel_ui(
+    mut commands: Commands,
+) {
+    build_fuel_ui(&mut commands);
+}
+
+fn build_fuel_ui(
+    commands: &mut Commands,
+) {
+    commands.spawn((
+        NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                right: Val::Px(20.0),
+                top: Val::Px(20.0),
+                width: Val::Px(200.0),
+                height: Val::Px(30.0),
+                ..default()
+            },
+            background_color: Color::srgb(0.1, 0.1, 0.1).into(),
+            ..default()
+        },
+        FuelUi
+    )).with_children(|parent| {
+        parent.spawn(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                border: UiRect::all(Val::Px(2.0)),
+                ..default()
+            },
+            background_color: Color::BLACK.into(),
+            ..default()
+        }).with_children(|parent| {
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Percent(100.0), 
+                        height: Val::Percent(100.0),
+                        ..default()
+                    },
+                    background_color: Color::srgb(0.5, 0.5, 0.0).into(),
+                    ..default()
+                },
+                FuelBar,
+            ));
+        });
+    });
+}
