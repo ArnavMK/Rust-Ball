@@ -224,23 +224,70 @@ pub fn force_remove_powerups(
 pub fn toggle_player_collision(
     input: Res<ButtonInput<KeyCode>>,
     mut player_query: Query<&mut Player>,
-    mut event: EventWriter<OnPlayerCollisionStateChanged>
+    mut event: EventWriter<OnPlayerCollisionStateChanged>,
+    fuel: Res<Fuel>
 ) {
             
     if let Ok(mut player) = player_query.get_single_mut() {
 
-        if input.just_pressed(KeyCode::Space) && player.can_collide {
-            player.can_collide = false;
-            event.send(OnPlayerCollisionStateChanged {state: false});
+        if !fuel.empty {
+            
+            // start immunity
+            if input.just_pressed(KeyCode::Space) && player.can_collide {
+                player.can_collide = false;
+                event.send(OnPlayerCollisionStateChanged {state: false});
+            }
+        
+            // disable immunity
+            if input.just_released(KeyCode::Space) && !player.can_collide {
+                player.can_collide = true;
+                event.send(OnPlayerCollisionStateChanged {state: true});
+            }
         }
-
-        if input.just_released(KeyCode::Space) && !player.can_collide {
-            player.can_collide = true;
-            event.send(OnPlayerCollisionStateChanged {state: true});
+        else {
+            if !player.can_collide {
+                player.can_collide = true;
+                event.send(OnPlayerCollisionStateChanged {state: true});
+            }
         }
     }
 }
 
+pub fn fuel_system(
+    mut fuel: ResMut<Fuel>,
+    player_query: Query<&Player>,
+    time: Res<Time>
+) {
+    if let Ok(player) = player_query.get_single() {
+    
+        let mut amount = fuel.amount;
+
+        if !player.can_collide && !fuel.empty {
+            amount -= fuel.decrease_speed * time.delta_seconds();
+        }
+
+        fuel.amount = amount.clamp(0.0, 100.0);
+
+        if fuel.amount == 0.0 && !fuel.empty{
+            fuel.empty = true;
+        }
+
+        if fuel.empty {
+            amount += fuel.increase_speed * time.delta_seconds();
+        }
+
+        fuel.amount = amount.clamp(0.0, 100.0);
+
+        if fuel.amount == 100.0 && fuel.empty {
+            fuel.empty = false;
+        }
+    }
+}
+
+pub fn reset_fuel_system(mut fuel: ResMut<Fuel>) {
+    fuel.empty = false;
+    fuel.amount = 100.0;
+}
 
 pub fn toggle_player_collision_visual(
     mut event: EventReader<OnPlayerCollisionStateChanged>,

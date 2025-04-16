@@ -36,6 +36,8 @@ impl Plugin for InGameUiPlugin {
 
             // Fuel bar
             .add_systems(OnEnter(AppState::InGame), spawn_fuel_ui)
+            .add_systems(Update, update_fuel_ui.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
+            .add_systems(OnExit(AppState::InGame), despawn_fuel_ui)
         ;
     }
 }

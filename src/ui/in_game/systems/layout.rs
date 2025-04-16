@@ -126,6 +126,15 @@ pub fn spawn_fuel_ui(
     build_fuel_ui(&mut commands);
 }
 
+pub fn despawn_fuel_ui(
+    mut commands: Commands,
+    fuel_ui_query: Query<Entity, With<FuelUi>>
+) {
+    if let Ok(fuel_ui) = fuel_ui_query.get_single() {
+        commands.entity(fuel_ui).despawn_recursive();
+    }
+}
+
 fn build_fuel_ui(
     commands: &mut Commands,
 ) {

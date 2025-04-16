@@ -4,7 +4,7 @@ use rand::prelude::*;
 use super::components::*;
 use crate::game::player::events::FreezEnemyEvent;
 
-const NUMBER_OF_ENIMIES: u32 = 15;
+const NUMBER_OF_ENIMIES: u32 = 1;
 const ENEMY_SIZE: f32 = 64.0;
 
 

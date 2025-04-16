@@ -3,6 +3,7 @@ use crate::ui::styles::*;
 use crate::ui::events::*;
 use crate::ui::components::*;
 use crate::game::score::resources::Score;
+use crate::game::player::resources::Fuel;
 
 pub fn resume_button_interaction(
     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<ResumeButton>)>,
@@ -47,5 +48,14 @@ pub fn update_score_ui(
 ) {
     if let Ok(mut text) = score_text_query.get_single_mut() {
         text.sections[0].value = format!("Score: {}", score.value);
+    }
+}
+
+pub fn update_fuel_ui(
+    fuel: Res<Fuel>,
+    mut fuel_bar_query: Query<&mut Style, With<FuelBar>>
+) {
+    if let Ok(mut fuel_bar) = fuel_bar_query.get_single_mut() {
+        fuel_bar.width = Val::Percent(fuel.amount);
     }
 }

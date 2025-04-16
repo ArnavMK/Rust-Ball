@@ -47,3 +47,22 @@ impl Default for ActivePowerups {
         }
     }
 }
+
+#[derive(Resource)]
+pub struct Fuel {
+    pub amount: f32,
+    pub decrease_speed: f32,
+    pub increase_speed: f32,
+    pub empty: bool
+}
+
+impl Default for Fuel {
+    fn default() -> Self {
+        Self {
+            amount: 100.0, 
+            decrease_speed: 80.0,
+            increase_speed: 20.0,
+            empty: false
+        }
+    }
+}

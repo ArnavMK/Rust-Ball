@@ -18,6 +18,7 @@ impl Plugin for PlayerPlugin {
             .init_resource::<PlayerSpeed>()
             .init_resource::<PlayerTextures>()
             .init_resource::<ActivePowerups>()
+            .init_resource::<Fuel>()
             .add_systems(OnEnter(AppState::InGame), spawn_player)
             .add_plugins(PlayerEvents)
             .add_systems(Update, (
@@ -34,10 +35,11 @@ impl Plugin for PlayerPlugin {
             .add_systems(Update, (
                 collect_powerups,
                 apply_powerup,
-                remove_powerup
+                remove_powerup,
+                fuel_system
             ).run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
 
-            .add_systems(OnExit(AppState::InGame), (despawn_player, force_remove_powerups))
+            .add_systems(OnExit(AppState::InGame), (despawn_player, force_remove_powerups, reset_fuel_system))
         ;
     }
 }
