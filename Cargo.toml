@@ -1,7 +1,8 @@
 [package]
-name = "bevy_test"
+name = "DogdeBall"
 version = "0.1.0"
 edition = "2024"
+include = ["assets/**/*"]  # Include all assets in the binary
 
 [profile.dev]
 opt-level = 1

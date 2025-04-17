@@ -3,6 +3,15 @@
 version = 4
 
 [[package]]
+name = "DogdeBall"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "once_cell",
+ "rand",
+]
+
+[[package]]
 name = "ab_glyph"
 version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -961,15 +970,6 @@ dependencies = [
  "concurrent-queue",
  "futures-lite",
  "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "bevy_test"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "once_cell",
- "rand",
 ]
 
 [[package]]

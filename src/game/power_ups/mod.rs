@@ -18,7 +18,7 @@ impl Plugin for PowerupPlugin {
             .add_systems(Update, 
                 spawn_power_ups.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running)))
             )
-            .add_systems(OnExit(AppState::InGame), despawn_powerups);
+            .add_systems(OnExit(AppState::InGame), despawn_powerups)
         ;
     }
 }

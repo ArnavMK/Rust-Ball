@@ -38,6 +38,11 @@ impl Plugin for InGameUiPlugin {
             .add_systems(OnEnter(AppState::InGame), spawn_fuel_ui)
             .add_systems(Update, update_fuel_ui.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
             .add_systems(OnExit(AppState::InGame), despawn_fuel_ui)
+
+            // Test powerup UI
+            .add_systems(OnEnter(AppState::InGame), spawn_powerup_ui)
+            .add_systems(Update, update_powerup_bar.run_if(in_state(AppState::InGame).and_then(in_state(GameState::Running))))
+            .add_systems(OnExit(AppState::InGame), despawn_powerup_ui)
         ;
     }
 }

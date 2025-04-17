@@ -4,9 +4,8 @@ use rand::prelude::*;
 use super::components::*;
 use crate::game::player::events::FreezEnemyEvent;
 
-const NUMBER_OF_ENIMIES: u32 = 1;
+const NUMBER_OF_ENIMIES: u32 = 10;
 const ENEMY_SIZE: f32 = 64.0;
-
 
 pub fn spawn_enimies(
     mut commands: Commands,
@@ -17,13 +16,12 @@ pub fn spawn_enimies(
     if let Ok(window) = window_query.get_single() {
 
         for _ in 0..NUMBER_OF_ENIMIES {
-
-            let x = (random::<f32>() * (window.width() - ENEMY_SIZE * 2.0)) - (window.width()/2.0 - ENEMY_SIZE);
-            let y = (random::<f32>() * (window.height() - ENEMY_SIZE * 2.0)) - (window.height()/2.0 - ENEMY_SIZE);   
-
+        
+            let transform = get_random_transform(window);
+            
             commands.spawn((
                 SpriteBundle {
-                    transform: Transform::from_xyz(x, y, 0.0),
+                    transform,
                     texture: asset_server.load("sprites/ball_red_small.png"),
                     ..default()
                 },
@@ -31,6 +29,48 @@ pub fn spawn_enimies(
                     direction: Vec3::new(random::<f32>() * 2.0 - 1.0, random::<f32>() * 2.0 - 1.0, 0.0).normalize()
                 }
             ));
+        }
+    }
+}
+
+pub fn spawn_enemy_over_time(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
+    time: Res<Time>,
+    window_query: Query<&Window, With<PrimaryWindow>>
+) {
+    if enemy_spawn_timer.timer.tick(time.delta()).finished() {
+
+        if let Ok(window) = window_query.get_single() {
+
+            commands.spawn((
+                SpriteBundle {
+                    transform: get_random_transform(&window),
+                    texture: asset_server.load("sprites/ball_red_small.png"),
+                    ..default()
+                },
+                Enemy {
+                    direction: Vec3::new(random::<f32>() * 2.0 - 1.0, random::<f32>() * 2.0 - 1.0, 0.0).normalize()
+                }
+            ));
+        }
+    }
+}
+
+fn get_random_transform(window: &Window) -> Transform {
+
+    loop {
+        let x = (random::<f32>() * (window.width() - ENEMY_SIZE * 2.0)) - (window.width()/2.0 - ENEMY_SIZE);
+        let y = (random::<f32>() * (window.height() - ENEMY_SIZE * 2.0)) - (window.height()/2.0 - ENEMY_SIZE);   
+       
+        let transform = Transform::from_xyz(x, y, 0.0);
+        let origin = Transform::from_xyz(0.0, 0.0, 0.0);
+
+        let distance = transform.translation.distance(origin.translation);
+
+        if distance >= 100.0 {
+            break transform;
         }
     }
 }

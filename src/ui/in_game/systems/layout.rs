@@ -178,3 +178,32 @@ fn build_fuel_ui(
         });
     });
 }
+
+pub fn spawn_powerup_ui(
+    mut commands: Commands,
+) {
+    commands.spawn((
+        NodeBundle {
+            style: Style {
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                width: Val::Auto,
+                height: Val::Px(50.0),
+                top: Val::Px(10.0),
+                left: Val::Percent(45.0),
+                column_gap: Val::Px(10.0),
+                ..default()
+            },
+            ..default()
+        },
+        PowerupBar
+    ));
+}
+
+pub fn despawn_powerup_ui(mut commands: Commands, powerup_bar_query: Query<Entity, With<PowerupBar>>) {
+    if let Ok(entity) = powerup_bar_query.get_single() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+

@@ -19,7 +19,7 @@ pub fn toggle_state(
 
 pub fn on_resume_button_cliked(
     mut next_state: ResMut<NextState<GameState>>,
-    mut event: EventReader<OnResumeButtonClicked>
+    mut event: EventReader<OnResumeButtonClicked>,
 ) {
     for _ in event.read() {
         next_state.set(GameState::Running);

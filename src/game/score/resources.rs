@@ -31,3 +31,25 @@ impl Default for Score {
     }
 }
 
+#[derive(Component)]
+pub struct MemeAssets{
+    pub laughing: Vec<Handle<Image>>,
+    pub appriciate: Vec<Handle<Image>>
+}
+
+impl FromWorld for MemeAssets {
+    fn from_world(world: &mut World) -> Self{
+        let asset_server = world.resource::<AssetServer>();
+
+        Self {
+            laughing: vec![
+                asset_server.load("sprites/old_gut.jpg"),
+                asset_server.load("sprites/spider_man.jpg")
+            ],
+            appriciate: vec![
+                
+            ]
+        }
+    }
+}
+

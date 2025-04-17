@@ -21,6 +21,13 @@ impl Powerup {
             Powerup::Freez {duration, ..} => *duration
         }
     }
+
+    pub fn image_path(&self) -> &str {
+        match self {
+            Powerup::SpeedBoost {..} => "speed_boost.png",
+            Powerup::Freez {..} => "test_power.png"
+        }
+    }
 }
 
 pub const POWERUP_DEFINITIONS: &[(Powerup, &str)] = &[

@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 use std::fs::File;
 use std::io::prelude::*;
-use crate::game::player::events::OnPlayerDeath;
-
-use super::*;
 use crate::ui::events::OnPlayButtonClicked;
+use super::*;
 
 const PATH: &str = "./player_data.txt" ;
 
@@ -45,7 +43,7 @@ pub fn create_player_log_file(mut score: ResMut<Score>) {
         },
         Err(_) => {
             let mut f = File::create(PATH).expect("Could not create a file");
-            f.write_all(b"0");
+            f.write_all(b"0").expect("Could not write to file");
         }
     }
 
@@ -54,7 +52,7 @@ pub fn create_player_log_file(mut score: ResMut<Score>) {
 pub fn save_score_in_file(mut score: ResMut<Score>) {
     let last_score: u32 = read_info();
 
-    if (last_score < score.value) {
+    if last_score < score.value {
         save_info(score.value.to_string());
         score.highest_score = score.value;
     }

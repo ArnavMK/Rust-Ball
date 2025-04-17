@@ -39,3 +39,15 @@ pub struct FuelUi;
 
 #[derive(Component)]
 pub struct FuelBar;
+
+#[derive(Component)]
+pub struct PowerupBar;
+
+#[derive(Component)]
+pub struct PowerupSymbol {
+    pub time_remaining: f32,
+    pub total_time: f32
+}
+
+#[derive(Component)]
+pub struct PowerupTimerBar;

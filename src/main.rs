@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 use crate::game::*;
 use crate::ui::events::*;
 use crate::game::player::events::*;
@@ -11,7 +12,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_state::<AppState>()
-        .add_systems(Startup, spawn_camera)
+        .add_systems(Startup, (spawn_camera, set_window_title))
         .add_systems(Update, (
             game_over_on_player_death.run_if(in_state(AppState::InGame)),
             start_game_state.run_if(in_state(AppState::MainMenu).or_else(in_state(AppState::GameOver))),
@@ -52,4 +53,12 @@ fn start_game_state(
         next_app_state.set(AppState::InGame);
         next_game_state.set(GameState::Countdown);
     }
+}
+
+fn set_window_title(
+    mut window_query: Query<&mut Window, With<PrimaryWindow>>,
+) {
+    if let Ok(mut window) = window_query.get_single_mut() {
+        window.title = "Dogde Ball - Arnav Kothari".to_string();
+    } 
 }

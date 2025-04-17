@@ -25,6 +25,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             not_collidable_texture: asset_server.load("sprites/hole.png")
         }
     ));
+
 }
 
 
@@ -155,7 +156,6 @@ pub fn apply_powerup(
 
        match powerup {
             Powerup::SpeedBoost {multiplier, ..} => {
-                player_speed.original_speed = player_speed.speed;
                 player_speed.speed *= multiplier;
                 println!("SpeedBoost applied: {}m/s", player_speed.speed);
             }   
@@ -177,7 +177,6 @@ pub fn apply_powerup(
         }
         true
     });
-
 }
 
 pub fn remove_powerup(

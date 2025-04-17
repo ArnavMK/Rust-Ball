@@ -21,4 +21,17 @@ impl Default for EnemySpeed {
     }
 }
 
+#[derive(Resource)]
+pub struct EnemySpawnTimer {
+    pub timer: Timer
+}
+
+impl Default for EnemySpawnTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(10.0, TimerMode::Repeating)
+        }
+    }
+}
+
 
